@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockMonitor.Application.Features.Identity.AppUser.Commads.LoginUser;
+using StockMonitor.Application.Features.Identity.AppUser.Commads.RefreshToken;
 
 namespace StockMonitor.WebAPI.Controllers
 {
@@ -19,6 +19,13 @@ namespace StockMonitor.WebAPI.Controllers
         {
             LoginUserResponse response = await _mediator.Send(user);
             return response;
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RefreshToken([FromQuery] string refreshToken)
+        {
+            RefreshTokenResponse token = await _mediator.Send(new RefreshTokenRequest() { RefreshToken = refreshToken });
+            return Ok(token);
         }
     }
 }

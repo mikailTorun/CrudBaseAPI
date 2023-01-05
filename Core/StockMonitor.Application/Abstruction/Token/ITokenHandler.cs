@@ -3,6 +3,6 @@
     public interface ITokenHandler
     {
         Models.Token GenerateAccessToken(int min);
-        Models.Token GenerateRefreshToken(int min);
+        string GenerateRefreshToken();
     }
 }

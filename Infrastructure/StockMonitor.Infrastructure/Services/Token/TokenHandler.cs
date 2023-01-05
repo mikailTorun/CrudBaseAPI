@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using StockMonitor.Application.Abstruction.Token;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StockMonitor.Infrastructure.Services.Token
 {
@@ -39,34 +35,18 @@ namespace StockMonitor.Infrastructure.Services.Token
 
             JwtSecurityTokenHandler tokenHandler = new();
             token.AccessToken =  tokenHandler.WriteToken(jwtSecurityToken);
-
+            token.RefreshToken = GenerateRefreshToken();
+            
 
             return token;
         }
 
-        public Application.Models.Token GenerateRefreshToken(int min)
+        public string GenerateRefreshToken()
         {
-            Application.Models.Token token = new();
-            // sec. key in simetriği alınır
-            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_configuration["Token:Key"]));
-            //şifrelenniş kimlik olusuturulur
-            SigningCredentials signingCredentials = new(key, SecurityAlgorithms.HmacSha256);
+            string guid = Guid.NewGuid().ToString().Replace("-","") + Guid.NewGuid().ToString().Replace("-","");
+            byte[] bytes = Encoding.ASCII.GetBytes(guid.Replace("=",""));
 
-            token.Expiration = DateTime.UtcNow.AddMinutes(min);
-
-            JwtSecurityToken jwtSecurityToken = new(
-                audience: _configuration["Token:Audience"],
-                issuer: _configuration["Token:Issuer"],
-                expires: token.Expiration,
-                notBefore: DateTime.UtcNow,//üretildikten ne kadar sonra devreye girsin?. hemen olacak sekilde ayarladık
-                signingCredentials: signingCredentials
-                );
-
-            JwtSecurityTokenHandler tokenHandler = new();
-            token.AccessToken = tokenHandler.WriteToken(jwtSecurityToken);
-
-
-            return token;
+            return Convert.ToBase64String(bytes);
         }
     }
 }

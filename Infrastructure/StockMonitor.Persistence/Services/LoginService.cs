@@ -1,16 +1,10 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using StockMonitor.Application.Abstruction.Services.Identity;
 using StockMonitor.Application.Abstruction.Token;
 using StockMonitor.Application.Features.Identity.AppUser.Commads.LoginUser;
 using StockMonitor.Application.Models;
 using StockMonitor.Domain.Entities.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Azure.Core.HttpHeader;
 
 namespace StockMonitor.Persistence.Services
 {
@@ -19,14 +13,17 @@ namespace StockMonitor.Persistence.Services
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenHandler _tokenHandler;
+        private readonly IAppUserService _appUserService;
 
-        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenHandler tokenHandler)
+        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenHandler tokenHandler, IAppUserService appUserService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenHandler = tokenHandler;
+            _appUserService = appUserService;
         }
 
+        
         public async Task<LoginUserResponse> Login(LoginUserRequest loginRequest)
         {
             AppUser user = await _userManager.FindByNameAsync(loginRequest.Username);
@@ -39,6 +36,8 @@ namespace StockMonitor.Persistence.Services
             if (result.Succeeded)// Authentication sağlandı
             {
                 Token token = _tokenHandler.GenerateAccessToken(5);
+                user.RefreshToken = token.RefreshToken;
+                await _appUserService.UpdateRefreshToken(token.RefreshToken,user,token.Expiration,1);
                 return new()
                 {
                     IsSucceed = true,
@@ -50,6 +49,19 @@ namespace StockMonitor.Persistence.Services
                 IsSucceed = false,
                 Message = "Kimlik doğrulama hatası"
             };
+        }
+
+        public async Task<Token> RefreshTokenLogin(string refreshTokenLoginRequest)
+        {
+            AppUser? user = await _userManager.Users.FirstOrDefaultAsync(x=> x.RefreshToken == refreshTokenLoginRequest);
+            if (user != null && user.RefreshTokenEndDate > DateTime.UtcNow)
+            {
+                Token token = _tokenHandler.GenerateAccessToken(5);
+                await _appUserService.UpdateRefreshToken(token.RefreshToken,user,token.Expiration,5);
+                return token;
+            }
+            else
+                throw new Exception("Token üretilemedi");
         }
     }
 }
