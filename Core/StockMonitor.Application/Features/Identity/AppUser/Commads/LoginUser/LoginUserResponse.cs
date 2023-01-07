@@ -12,5 +12,6 @@ namespace StockMonitor.Application.Features.Identity.AppUser.Commads.LoginUser
         public bool IsSucceed { get; set; }
         public string Message { get; set; }
         public Token Token { get; set; }
+        public List<string>? UserRoles { get; set; }
     }
 }

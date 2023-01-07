@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockMonitor.Application.Constants;
 using StockMonitor.Application.Features.Identity.Customer.Commads;
 using StockMonitor.Application.Features.Identity.Customer.Queries.GetAllCustomerQuery;
 
@@ -28,6 +29,7 @@ namespace StockMonitor.WebAPI.Controllers
         }
         [HttpGet]
         [Route("GetAllCustomerAsync")]
+        [Authorize(Roles = AppUserRole.Admin)]
         public async Task<GetAllCustomerQueryResponse> GetAllCustomerAsync()
         {
             return await _mediator.Send(new GetAllCustomerQueryRequest());

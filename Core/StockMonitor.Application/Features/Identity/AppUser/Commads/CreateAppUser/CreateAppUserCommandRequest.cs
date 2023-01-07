@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using StockMonitor.Application.Constants;
+using StockMonitor.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +18,6 @@ namespace StockMonitor.Application.Features.Identity.AppUser.Commads.CreateAppUs
         public string PasswordConfirm { get; set; }
         public string Email { get; set; }
         public Guid CustomerId { get; set; }
+        public string UserRole { get; set; }
     }
 }

@@ -27,6 +27,7 @@ namespace StockMonitor.WebAPI.Controllers
         //}
         [HttpPost]
         [Route("CreateUserAsync")]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateUserAsync(CreateAppUserCommandRequest user)
         {
             CreateAppUserCommandResponse response = await _mediator.Send(user);

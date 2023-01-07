@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StockMonitor.Domain.Entities.Identity;
+using StockMonitor.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

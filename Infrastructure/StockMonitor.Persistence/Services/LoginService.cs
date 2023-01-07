@@ -12,18 +12,20 @@ namespace StockMonitor.Persistence.Services
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly RoleManager<AppRole> _roleManager;
         private readonly ITokenHandler _tokenHandler;
         private readonly IAppUserService _appUserService;
 
-        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenHandler tokenHandler, IAppUserService appUserService)
+        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenHandler tokenHandler, IAppUserService appUserService, RoleManager<AppRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenHandler = tokenHandler;
             _appUserService = appUserService;
+            _roleManager = roleManager;
         }
 
-        
+
         public async Task<LoginUserResponse> Login(LoginUserRequest loginRequest)
         {
             AppUser user = await _userManager.FindByNameAsync(loginRequest.Username);
@@ -35,14 +37,15 @@ namespace StockMonitor.Persistence.Services
             SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, false);
             if (result.Succeeded)// Authentication sağlandı
             {
-                Token token = _tokenHandler.GenerateAccessToken(5);
+                Token token = await _tokenHandler.GenerateAccessTokenAsync(1, user);
                 user.RefreshToken = token.RefreshToken;
                 await _appUserService.UpdateRefreshToken(token.RefreshToken,user,token.Expiration,1);
                 return new()
                 {
                     IsSucceed = true,
-                    Token = token
-                };
+                    Token = token,
+                    UserRoles = (await _userManager.GetRolesAsync(user)).ToList()
+            };
             }
             return new()
             {
@@ -56,8 +59,8 @@ namespace StockMonitor.Persistence.Services
             AppUser? user = await _userManager.Users.FirstOrDefaultAsync(x=> x.RefreshToken == refreshTokenLoginRequest);
             if (user != null && user.RefreshTokenEndDate > DateTime.UtcNow)
             {
-                Token token = _tokenHandler.GenerateAccessToken(5);
-                await _appUserService.UpdateRefreshToken(token.RefreshToken,user,token.Expiration,5);
+                Token token = await _tokenHandler.GenerateAccessTokenAsync(1, user);
+                await _appUserService.UpdateRefreshToken(token.RefreshToken,user,token.Expiration,1);
                 return token;
             }
             else

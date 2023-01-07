@@ -1,8 +1,10 @@
-﻿namespace StockMonitor.Application.Abstruction.Token
+﻿using StockMonitor.Domain.Entities.Common;
+
+namespace StockMonitor.Application.Abstruction.Token
 {
     public interface ITokenHandler
     {
-        Models.Token GenerateAccessToken(int min);
+        Task<Application.Models.Token> GenerateAccessTokenAsync(int min, AppUser user);
         string GenerateRefreshToken();
     }
 }
