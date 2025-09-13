@@ -1,4 +1,4 @@
-name: .NET
+name: .NET Publish
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     types: [ closed ]
 
 jobs:
-  build:
+  publish:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
@@ -21,12 +21,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore
+      - name: Publish project
+        run: dotnet publish -c Release -o ./publish
 
-      - name: Upload build artifacts
+      - name: Upload published files
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: |
-            **/bin/Debug/net8.0/
+          name: published-output
+          path: ./publish
