@@ -7,5 +7,8 @@ namespace StockMonitor.Application.Abstruction.Services.Identity
     {
         Task<CreateAppUserCommandResponse> CreateUser(CreateAppUserCommandRequest userRequest);
         Task UpdateRefreshToken(string refreshToken, AppUser user, DateTime accessTokenLifeTime, int refreshTokenTime);
+
+
+        
     }
 }
