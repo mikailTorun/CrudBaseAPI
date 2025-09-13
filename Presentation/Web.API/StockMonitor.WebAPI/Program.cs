@@ -9,12 +9,6 @@ using StockMonitor.Infrastructure.Filters;
 using StockMonitor.Persistence;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
-
-
-
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(ops => ops.Filters.Add<ValidationFilter>())
