@@ -3,11 +3,11 @@ name: .NET
 on:
   pull_request:
     branches: [ "master" ]
-    types: [ closed ]  # Sadece PR kapandığında tetiklenir
+    types: [ closed ]
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true  # Sadece merge edildiyse çalıştır
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -23,3 +23,10 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            **/bin/Debug/net8.0/
