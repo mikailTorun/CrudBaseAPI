@@ -9,7 +9,7 @@ using StockMonitor.Infrastructure.Filters;
 using StockMonitor.Persistence;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args)
 
 builder.Services.AddControllers(ops => ops.Filters.Add<ValidationFilter>())
     .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<CreateCustomerCommandRequestValidator>())
